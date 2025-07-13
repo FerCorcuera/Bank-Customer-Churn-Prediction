@@ -120,3 +120,23 @@ To better understand the distribution and characteristics of the dataset’s **n
 - **EstimatedSalary:**  
   Average around €100,000 but with a **very wide range** (from €11.5 to €199,992).  
   No significant skewness → although due to high dispersion, **scaling or normalization** may be needed when using models sensitive to feature magnitude.
+  
+### Outlier Analysis
+
+We performed boxplot-based outlier detection using the IQR method for key numerical features:
+
+- **Age:**  
+  - Detected **359 outliers** (3.59% of the dataset).  
+  - Among them, **73 customers churned**, representing ~20.3%, slightly below the overall churn rate.  
+  - These values mostly correspond to elderly customers (ages 61+), a minority group in the dataset.  
+  - **Decision:** We chose to **retain these observations**, as their proportion is low and they provide potentially valuable insights for senior segment analysis.
+
+- **CreditScore:**  
+  - Only **15 outliers** detected (0.15% of the dataset).  
+  - All 15 customers churned, but the sample size is **too small** to draw significant conclusions.  
+  - **Decision:** Outliers were **retained**, as their presence is negligible and unlikely to distort model performance.
+
+In both cases, we chose **not to remove or cap** the outliers due to their low frequency and limited impact on the predictive model. This decision preserves the integrity and representativeness of the dataset.
+
+![Boxplots of Numerical Variables](Images/Boxplots%20-%20Univariate.png)
+
