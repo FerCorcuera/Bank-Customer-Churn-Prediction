@@ -477,3 +477,11 @@ The plot above displays the importance of each feature based on the trained Deci
 The lift curve demonstrates how effective our model is at identifying likely churners compared to a random selection. At the start, the lift exceeds **4.5**, meaning that the top-ranked customers are over 4.5 times more likely to churn than average.
 
 This behavior is especially useful in business contexts where we want to **target a limited percentage of clients** (e.g., top 10–20%) for retention campaigns. The model allows us to allocate resources more efficiently by prioritizing high-risk customers.
+
+### Gain Curve – Classification Tree
+
+<img src="Images/Gain Curve - Class Tree.png" width="600"/>
+
+*Figure: Gain curve illustrating the effectiveness of the decision tree model in identifying churners compared to a random strategy.*
+
+The gain curve shows that the classification tree significantly outperforms random selection. By targeting just **20% of the clients**, the model captures **more than 60%** of churners. This demonstrates the model’s ability to effectively prioritize high-risk customers, making it a valuable tool for **resource allocation and targeted retention strategies**.
