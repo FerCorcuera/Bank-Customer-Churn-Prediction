@@ -364,4 +364,71 @@ tree_model.fit(X_train, y_train)
 y_pred_tree = tree_model.predict(X_test)
 y_prob_tree = tree_model.predict_proba(X_test)[:, 1]
 ```
+## Decision Tree – Preliminary Evaluation
+
+After training a basic Decision Tree classifier using a balanced class weight strategy, we evaluated its performance on the test set.
+
+### Results
+- **Confusion Matrix**:
+
+|                 | **Predicted: Stayed** | **Predicted: Churned** |
+|-----------------|-----------------------|-------------------------|
+| **Actual: Stayed**   | 1359                  | 234                     |
+| **Actual: Churned**  | 217                   | 190                     |
+
+- **Classification Report**:
+- Precision (Stayed): **0.86**
+- Recall (Stayed): **0.85**
+- Precision (Churned): **0.45**
+- Recall (Churned): **0.47**
+- Accuracy: **0.77**
+- AUC: **0.660**
+
+The results suggest that the decision tree performs slightly better than a naive classifier, but still struggles to identify churned customers effectively.
+
+### First ROC Curve
+
+<p align="center">
+  <img src="Images/Roc%20Cruve%20-%20Class%20Tree%201.png" width="400"/>
+</p>
+
+*Figure: ROC Curve for baseline Decision Tree model*
+
+### Model Optimization: Decision Tree
+
+To enhance the performance of the baseline decision tree model, we performed hyperparameter tuning using **GridSearchCV** with 5-fold cross-validation. The goal was to optimize the model based on the **F1-score**, which balances precision and recall — a key priority due to the class imbalance in our dataset.
+
+The hyperparameters we tuned were:
+
+- `max_depth`: Controls the maximum depth of the tree  
+- `min_samples_split`: Minimum number of samples required to split an internal node  
+- `min_samples_leaf`: Minimum number of samples required to be at a leaf node  
+- `max_features`: Number of features to consider when looking for the best split
+
+from sklearn.model_selection import GridSearchCV
+from sklearn.tree import DecisionTreeClassifier
+
+```python
+param_grid = {
+    'max_depth': [3, 4, 5, 6, 7, 8],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 3, 5],
+    'max_features': [None, 'sqrt', 'log2']
+}
+
+tree = DecisionTreeClassifier(random_state=42, class_weight='balanced')
+grid_search = GridSearchCV(tree, param_grid, cv=5, scoring='f1', n_jobs=-1)
+grid_search.fit(X_train, y_train)
+
+print("Mejores hiperparámetros:", grid_search.best_params_)
+
+```
+
+After training, we used the **best estimator** returned by GridSearch to predict probabilities on the test set. Using a decision threshold of **0.64** (previously determined for better F1-score balance), we classified the final outputs and evaluated model performance.
+
+```python
+# Final classification with optimal tree
+y_prob = grid_search.best_estimator_.predict_proba(X_test)[:, 1]
+y_pred_final = (y_prob >= 0.64).astype(int)
+```
 
