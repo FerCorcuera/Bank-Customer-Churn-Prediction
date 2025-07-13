@@ -267,6 +267,16 @@ print(f"Optimal threshold: {optimal_threshold:.3f}")
 ```
 **Optimal threshold found: 0.543**
 
+Due to the class imbalance in our dataset (~20% churn), relying on the default threshold of 0.5 may not yield optimal results. To address this, we evaluated the model’s performance across different thresholds (ranging from 0.1 to 0.9), focusing on three key metrics: **Precision**, **Recall**, and **F1-score**.
+
+The goal in this context is to **identify churn-prone customers** who are both likely to leave and worth retaining, which requires a **balanced trade-off between Precision and Recall**. Maximizing Recall alone would flag too many false positives, while focusing on Precision could miss valuable at-risk clients.
+
+The threshold that achieved the **highest F1-score**, offering the best harmonic balance between Precision and Recall, was selected and applied to the final predictions.
+
+![Threshold Optimization - Logistic Regression](Images/Threshold_Optimization_Logic.png)
+
+
+
 ### 📊 Model Evaluation
 
 Predictions were made using the adjusted threshold of **0.543**. Below is the confusion matrix and classification report:
@@ -289,5 +299,5 @@ Predictions were made using the adjusted threshold of **0.543**. Below is the co
 
 - **Accuracy:** 0.74
 - **AUC**: 0.77
- **Interpretation:**  
-This logistic regression model provides a solid baseline. It handles class imbalance decently due to the `class_weight='balanced'` parameter, but there is **room for improvement**, especially in predicting the minority class (churn). Future steps could involve feature engineering, threshold tuning, or testing tree-based models like Random Forest or XGBoost.
+
+![Roc Curve - Logistic Regression](Images/Roc%20Curve%20-%20Logic.png)
