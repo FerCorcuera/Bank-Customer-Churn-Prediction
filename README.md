@@ -92,6 +92,9 @@ To better understand the distribution and characteristics of the dataset’s **n
 | NumOfProducts    | 1.53      | 1.00      | 0.58      | 0.38       | 0.58         | 0.74     | 0.58      | 1.00     | 4.00        | 3.00       |
 | EstimatedSalary  | 100,090.24| 100,193.91| 57,510.49 | 0.57       | 0.57         | 0.00     | -1.18     | 11.58    | 199,992.48  | 199,980.90 |
 
+## Distribution of Numeric Variables
+
+![Distribution Histograms](Images/Histograms.png)
 
 ### Univariate Analysis – Key Insights of numeric variables
 
