@@ -238,3 +238,56 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 ```
+## Logistic Regression Model
+
+We first implemented a **Logistic Regression** model to establish a solid baseline for churn prediction. The model was trained using `class_weight='balanced'` to address the class imbalance in the target variable (`Exited`), and we used **Youden’s Index** to determine an optimal classification threshold.
+
+### Model Training
+
+```python
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_curve, classification_report, confusion_matrix, roc_auc_score
+
+# Train logistic regression with class balancing
+logit_model = LogisticRegression(max_iter=1000, class_weight='balanced')
+logit_model.fit(X_train, y_train)
+
+# Predict probabilities
+y_prob = logit_model.predict_proba(X_test)[:, 1]
+
+# Compute ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_prob)
+
+# Find optimal threshold using Youden's Index
+j_scores = tpr - fpr
+optimal_idx = j_scores.argmax()
+optimal_threshold = thresholds[optimal_idx]
+
+print(f"Optimal threshold: {optimal_threshold:.3f}")
+```
+**Optimal threshold found: 0.543**
+
+### 📊 Model Evaluation
+
+Predictions were made using the adjusted threshold of **0.543**. Below is the confusion matrix and classification report:
+
+#### Confusion Matrix
+
+|                 | **Predicted: Stayed** | **Predicted: Churned** |
+|-----------------|-----------------------|-------------------------|
+| **Actual: Stayed**   | 1217                  | 376                     |
+| **Actual: Churned**  | 145                   | 262                     |
+
+#### Classification Report
+
+| Metric        | Class: Stayed (0) | Class: Churned (1) |
+|---------------|-------------------|---------------------|
+| Precision     | 0.89              | 0.41                |
+| Recall        | 0.76              | 0.64                |
+| F1-score      | 0.82              | 0.50                |
+| Support       | 1593              | 407                 |
+
+- **Accuracy:** 0.74
+- **AUC**: 0.77
+ **Interpretation:**  
+This logistic regression model provides a solid baseline. It handles class imbalance decently due to the `class_weight='balanced'` parameter, but there is **room for improvement**, especially in predicting the minority class (churn). Future steps could involve feature engineering, threshold tuning, or testing tree-based models like Random Forest or XGBoost.
