@@ -456,3 +456,24 @@ After tuning hyperparameters using GridSearchCV, the decision tree model showed 
 
 This model presents a **balanced improvement in both precision and recall** for the churn class (positive class), reaching an **F1-score of 0.60** and a strong **AUC-ROC of 0.81**, outperforming the logistic regression model. The confusion matrix shows that the model is better at capturing churned clients without excessively misclassifying non-churned ones. This makes it a **more robust tool for retention strategies**, with a more reliable risk segmentation than simpler linear models.
 
+### Feature Importance – Decision Tree
+
+<img src="Images/Importance%20of%20variables%20-%20Class%20Tree.png" width="600"/>
+
+*Figure: Variable importance scores from the tuned Decision Tree classifier.*
+
+The plot above displays the importance of each feature based on the trained Decision Tree. These scores reflect how much each variable contributed to splitting the data and improving the model’s ability to distinguish between churned and retained customers.
+
+- **Age** stands out as the most influential feature, indicating that older clients are more likely to leave the bank.
+- **Balance** and **Credit Score** also played important roles in determining churn.
+- On the other hand, variables like **Geography**, **Gender**, and **HasCrCard** had relatively low importance, suggesting they contributed little to the model's decision-making.
+
+### Lift Curve – Classification Tree
+
+<img src="Images/Lift%20Curve%20-%20Class%20Tree.png" width="600"/>
+
+*Figure: Lift Curve of the tuned Decision Tree model.*
+
+The lift curve demonstrates how effective our model is at identifying likely churners compared to a random selection. At the start, the lift exceeds **4.5**, meaning that the top-ranked customers are over 4.5 times more likely to churn than average.
+
+This behavior is especially useful in business contexts where we want to **target a limited percentage of clients** (e.g., top 10–20%) for retention campaigns. The model allows us to allocate resources more efficiently by prioritizing high-risk customers.
