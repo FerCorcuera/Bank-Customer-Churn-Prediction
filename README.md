@@ -502,7 +502,7 @@ The tree provides interpretable decision paths that help explain customer churn 
 
 ## XG Boost Model
 
-### 🧪 XGBoost – Initial Model Training
+### XGBoost – Initial Model Training
 
 We started by training a base **XGBoost classifier** using default parameters, with the addition of `scale_pos_weight` to address the class imbalance (only ~20% of customers churned). The model was trained on the full training dataset without feature scaling.
 
@@ -523,7 +523,7 @@ xgb_model.fit(X_train, y_train)
 y_pred = xgb_model.predict(X_test)
 y_prob = xgb_model.predict_proba(X_test)[:, 1]
 ```
-### 🔍 Initial Results – XGBoost Classifier
+### Initial Results – XGBoost Classifier
 
 |                  | Predicted: No Churn | Predicted: Churn |
 |------------------|---------------------|------------------|
