@@ -279,7 +279,7 @@ The threshold that achieved the **highest F1-score**, offering the best harmonic
   <img src="Images/logic_threshold_curve.png" alt="Precision, Recall and F1 vs Threshold" width="600"/>
 </p>
 
-### 📊 Model Evaluation
+### Model Evaluation - Logistic Regression
 
 Predictions were made using the adjusted threshold of **0.543**. Below is the confusion matrix and classification report:
 
@@ -347,3 +347,21 @@ The table below shows the coefficients from the logistic regression model along 
 
 The **Lift Curve** shows that the logistic regression model significantly outperforms random targeting, especially in the top customer deciles. For example, contacting the top 10% most likely churners yields up to **3.5 times** more actual churners than a random selection.  
 This highlights the model's practical value for **targeted retention strategies** and confirms its utility even with moderate predictive power.
+
+## Decision Tree Classifier
+
+### Model Training
+
+The Decision Tree model was trained using the `sklearn.tree.DecisionTreeClassifier`, applying **class balancing** to address the churn imbalance in the dataset. The model was fitted on the training set and used to generate both predicted classes and churn probabilities for evaluation.
+
+```python
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+
+tree_model = DecisionTreeClassifier(random_state=42, class_weight='balanced')
+tree_model.fit(X_train, y_train)
+
+y_pred_tree = tree_model.predict(X_test)
+y_prob_tree = tree_model.predict_proba(X_test)[:, 1]
+```
+
