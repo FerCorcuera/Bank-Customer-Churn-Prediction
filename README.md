@@ -499,3 +499,72 @@ The tree provides interpretable decision paths that help explain customer churn 
 - For **older clients (Age > 42.5)**:
   - **Inactive members** with **few products** or **higher ages (> 50.5)** are more likely to **churn**.
   - **Active members** tend to stay, unless they have **high balances** and **many products**.
+
+## XG Boost Model
+
+### 🧪 XGBoost – Initial Model Training
+
+We started by training a base **XGBoost classifier** using default parameters, with the addition of `scale_pos_weight` to address the class imbalance (only ~20% of customers churned). The model was trained on the full training dataset without feature scaling.
+
+```python
+from xgboost import XGBClassifier
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+
+xgb_model = XGBClassifier(
+    objective='binary:logistic',
+    eval_metric='logloss',
+    use_label_encoder=False,
+    random_state=42,
+    scale_pos_weight=(len(y_train[y_train == 0]) / len(y_train[y_train == 1]))
+)
+
+xgb_model.fit(X_train, y_train)
+
+y_pred = xgb_model.predict(X_test)
+y_prob = xgb_model.predict_proba(X_test)[:, 1]
+```
+### 🔍 Initial Results – XGBoost Classifier
+
+|                  | Predicted: No Churn | Predicted: Churn |
+|------------------|---------------------|------------------|
+| **Actual: No**   | 1393                | 200              |
+| **Actual: Yes**  | 155                 | 252              |
+
+**Classification Metrics:**
+
+| Metric            | Class 0 (No Churn) | Class 1 (Churn) |
+|-------------------|--------------------|------------------|
+| Precision         | 0.90               | 0.56             |
+| Recall            | 0.87               | 0.62             |
+| F1-score          | 0.89               | 0.59             |
+| **Accuracy**      |                    | **0.82**         |
+| **ROC AUC Score** |                    | **0.836**        |
+
+---
+
+- The model correctly identifies most non-churners and over half of the churners. Good overall accuracy (82%) and strong AUC score (0.836). This gives us a solid starting point before tuning the model.
+
+---
+
+### Tuned XGBoost – Evaluation
+
+After hyperparameter tuning, the optimized XGBoost model achieved the following results:
+
+| Metric            | Class 0 (No Churn) | Class 1 (Churn) |
+|-------------------|-------------------|-----------------|
+| **Precision**     | 0.91              | 0.56            |
+| **Recall**        | 0.86              | 0.68            |
+| **F1-score**      | 0.89              | 0.61            |
+| **Support**       | 1593              | 407             |
+
+- **Overall Accuracy:** 83%
+- **AUC:** 0.854
+
+### Observations:
+- Compared to previous models, recall for churners improved to **68%**, meaning the model is capturing more true churn cases.
+- The **precision for churners** (56%) is still moderate, suggesting that while we're identifying more potential churners, not all of them actually leave.
+- **AUC of 0.85** confirms stronger overall discrimination performance.
+
+These results make XGBoost the strongest candidate so far, balancing sensitivity and specificity better than logistic regression and decision trees.
+
+
