@@ -157,3 +157,84 @@ We analyzed the distribution of key categorical features to understand the compo
 #### Categorical Variables Distribution
 
 ![Categorical Variables Distribution](Images/Categoric%20Variables%20Distribution.png)
+
+## Bivariate Analysis – Key Findings
+
+We explored how the churn behavior (Exited) relates to other variables in the dataset. Key relationships emerged from the bivariate visualizations:
+
+- **Age vs. Exited:**  
+  Customers who left the bank tend to be significantly older, with a higher median age compared to those who stayed. This suggests age is an important factor in predicting churn.
+
+- **Geography vs. Exited:**  
+  Customers from **Germany** show the **highest churn rate**, while customers from France and Spain tend to remain with the bank. This may reflect regional satisfaction or policy differences.
+
+- **NumOfProducts vs. Exited:**  
+  Customers with **3 or more products** show disproportionately high churn. This is counterintuitive, as multi-product users are usually more loyal. It may indicate dissatisfaction with complex product bundles.
+
+- **Correlation Matrix:**  
+  The only strong correlation with `Exited` is **Age** (0.29). Other variables show very weak or negligible relationships, supporting the idea that **non-linear models** might better capture hidden patterns.
+
+### Visual Insights
+
+![Bivariate Visualizations](Images/Bivariate%20graphs.png)  
+*Figure: Key bivariate plots (Age, Geography, NumOfProducts vs. Exited)*
+
+![Correlation Matrix](Images/Correlationi%20Matrix.png)  
+*Figure: Pearson correlation matrix between numerical features and churn*
+
+## Data Preparation
+
+Before training the model, we performed basic preprocessing steps to clean and prepare the dataset:
+
+### 1. Feature Removal
+We dropped three variables that were not relevant for predictive modeling:
+
+- `RowNumber`: purely an index.
+- `CustomerId`: a unique identifier with no predictive value.
+- `Surname`: does not provide meaningful signal and could lead to unnecessary dimensionality if encoded.
+
+```python
+df.drop(columns=['RowNumber', 'CustomerId', 'Surname'], inplace=True)
+```
+### 🔤 2. Categorical Encoding
+
+To prepare the categorical features for modeling, we applied the following encoding techniques:
+
+- **Gender:** Binary label encoding where `"Male"` is encoded as `1` and `"Female"` as `0`.
+- **Geography:** One-hot encoding to represent the countries (`France`, `Spain`, `Germany`) as separate binary variables. We retained all categories by setting `drop_first=False` to allow models to learn from the full set.
+
+We also ensured that all dummy variables are of type `float`, which is required for compatibility with many machine learning models.
+
+```python
+# Label encoding for Gender
+df['Gender'] = df['Gender'].map({'Male': 1, 'Female': 0}).astype(float)
+
+# One-hot encoding for Geography (all categories kept)
+df = pd.get_dummies(df, columns=['Geography'], drop_first=False)
+
+# Ensuring dummy variables are floats
+for col in df.columns:
+    if df[col].dtype == 'bool':
+        df[col] = df[col].astype(float)
+```
+### 3. Feature and Target Definition
+
+We separated the dataset into features (`X`) and target variable (`y`) for supervised learning.
+
+- **Target (`y`)**: The `Exited` column, which indicates whether the customer churned (1) or not (0).
+- **Features (`X`)**: All remaining columns after dropping the non-informative variables and applying encoding.
+
+We then split the dataset into training and testing subsets using stratified sampling to maintain the same class distribution of the target variable.
+
+```python
+# Define target and features
+X = df.drop(columns='Exited')
+y = df['Exited']
+
+# Split into training and test sets with stratified sampling
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+```
