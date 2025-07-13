@@ -18,6 +18,33 @@ The project has both business and technical goals:
 
 - **Analytical Objective**: Develop a machine learning model with at least **85% prediction accuracy** to classify customers by churn risk. The goal is to reduce the overall churn rate by **at least 10%** over the next six months. The final model should be deployment-ready by the end of the current fiscal quarter.
 
+## Results:
+
+### Models Compared
+- **Logistic Regression**: Easy to interpret, but lower predictive power.
+- **Decision Tree**: Good balance between performance and explainability.
+- **XGBoost**: Best overall performance.
+
+### Key Result (XGBoost tuned model)
+- **Accuracy**: 84.8%
+- **F1-score (Churn)**: 0.62
+- **AUC**: 0.85
+- **Lift (Top 20%)**: ~3.5× better than random and **Gain (Top 20%)**: Captures ~60% of churners
+
+### Strategic Insights
+- High-balance clients with high salaries are more likely to churn.
+- Customers over 43 years old or not actively engaged are at higher risk.
+- German customers showed the highest churn probability.
+
+### Business Impact
+If 5,000 clients at high churn risk are contacted:
+- **Retention cost**: €2,000,000 (5,000 × €400)
+- **Potential loss avoided**: €9,000,000 (5,000 × €1,800)
+- **Net benefit**: €7,000,000
+
+---
+
+
 ### Dataset Overview
 
 This dataset consists of 10,000 customer records from XYZ Bank. Each row represents a client and contains demographic, financial, and behavioral features. The target variable is `Exited`, indicating whether the customer has left the bank.
