@@ -546,25 +546,203 @@ y_prob = xgb_model.predict_proba(X_test)[:, 1]
 
 ---
 
+## XGBoost – Hyperparameter Tuning
+
+After an initial training phase, we used a **Grid Search with cross-validation (cv=5)** to identify the best set of hyperparameters based on F1-score performance. The optimal configuration found was:
+
+```python
+xgb_best = XGBClassifier(
+    objective='binary:logistic',
+    eval_metric='logloss',
+    use_label_encoder=False,
+    random_state=42,
+    scale_pos_weight=(len(y_train[y_train == 0]) / len(y_train[y_train == 1])),  # To address class imbalance
+    n_estimators=100,
+    max_depth=7,
+    learning_rate=0.1,
+    min_child_weight=1,
+    subsample=0.8,
+    colsample_bytree=0.8
+)
+```
+### Optimal Threshold Selection
+
+Again, due to the class imbalance in the dataset, relying on the default threshold of 0.5 may not yield the best balance between Precision and Recall. To address this, we evaluated the model's performance across a range of thresholds (from 0.1 to 0.9), focusing on **Precision**, **Recall**, and **F1-score**. The threshold that **maximized the F1-score** was selected as the optimal cut-off point for final predictions.
+
+```python
+best_idx = np.argmax(f1_scores)
+best_threshold = thresholds[best_idx]
+print(f"Best threshold by F1-score: {best_threshold:.3f}")
+```
+
+-  **Best Threshold Identified:** `0.590`
+
+This value represents the best compromise between capturing true churners and avoiding false positives.
+
+<p align="center">
+  <img src="Images/xgboost - ROC.png" width="600"/>
+</p>
+
+*Figure: Precision, Recall and F1-score vs Threshold – XGBoost*
+
+
 ### Tuned XGBoost – Evaluation
 
-After hyperparameter tuning, the optimized XGBoost model achieved the following results:
+After applying hyperparameter tuning and selecting the optimal classification threshold (0.59), we evaluated the final performance of the XGBoost model on the test set:
 
-| Metric            | Class 0 (No Churn) | Class 1 (Churn) |
-|-------------------|-------------------|-----------------|
-| **Precision**     | 0.91              | 0.56            |
-| **Recall**        | 0.86              | 0.68            |
-| **F1-score**      | 0.89              | 0.61            |
-| **Support**       | 1593              | 407             |
+### Confusion Matrix
 
-- **Overall Accuracy:** 83%
-- **AUC:** 0.854
+|               | Predicted: No Churn | Predicted: Churn |
+|---------------|---------------------|------------------|
+| **Actual: No Churn** | 1446                | 147              |
+| **Actual: Churn**    | 157                 | 250              |
 
-### Observations:
-- Compared to previous models, recall for churners improved to **68%**, meaning the model is capturing more true churn cases.
-- The **precision for churners** (56%) is still moderate, suggesting that while we're identifying more potential churners, not all of them actually leave.
-- **AUC of 0.85** confirms stronger overall discrimination performance.
+### Classification Metrics
 
-These results make XGBoost the strongest candidate so far, balancing sensitivity and specificity better than logistic regression and decision trees.
+- **Accuracy**: 85%
+- **Precision**: 
+  - Class 0 (No Churn): 90%
+  - Class 1 (Churn): 63%
+- **Recall**: 
+  - Class 0 (No Churn): 91%
+  - Class 1 (Churn): 61%
+- **F1-Score**:
+  - Class 0 (No Churn): 90%
+  - Class 1 (Churn): 62%
+- **AUC Score**: **0.854**
+
+The tuned XGBoost model shows **balanced performance**, particularly improving recall and F1-score for the **churn class** compared to previous models. This makes it well-suited for **prioritizing customer retention strategies** by better identifying likely churners, while maintaining strong overall accuracy.
+
+### Lift Curve – XGBoost (Tuned)
+
+The Lift Curve illustrates how much better our model performs compared to random targeting.
+
+As shown in the plot below, the **XGBoost model** provides a strong uplift in the early deciles. Specifically, the top 10–20% of customers ranked by predicted probability are **up to 4.8 times** more likely to churn than a randomly selected group.
+
+This validates the model's value in **targeted retention strategies**, enabling the business to prioritize high-risk customers effectively.
+
+<p align="center">
+  <img src="Images/Lift xgboost.png" width="600"/>
+</p>
+
+*Figure: Lift curve showing model performance over random selection*
+
+### Feature Importance – XGBoost (Tuned Model)
+
+The chart below displays the importance of each variable as determined by the XGBoost model.
+
+The top features driving churn prediction are:
+
+- **NumOfProducts**: Most influential predictor. Clients with fewer products are more likely to churn.
+- **IsActiveMember**: Inactivity strongly correlates with churn risk.
+- **Age** and **Geography_Germany**: Older clients and those located in Germany show higher churn tendencies.
+- **Balance** and **Gender** also play relevant roles, though with lower weight.
+
+<p align="center">
+  <img src="Images/Importance of the variables - XGBOOST.png" width="600"/>
+</p>
+
+*Figure: Feature importance plot from XGBoost tuned model*
+
+### Gain Curve – XGBoost
+
+<img src="Images/Gain Cruve - XGBoost.png" width="600"/>
+
+The Gain Curve shows how effectively the XGBoost model identifies churners when prioritizing clients based on predicted probability.
+
+- By contacting the top **20%** of customers ranked by model confidence, we capture around **60%** of actual churners.
+- The curve consistently stays above the diagonal (random selection), indicating solid performance in targeting efforts.
+- This makes XGBoost a strong candidate for marketing or retention campaigns, allowing the company to focus resources on high-risk customers with better precision.
+
+###  Model Performance Comparison
+
+| Metric              | Logistic Regression | Decision Tree        | XGBoost                |
+|---------------------|---------------------|----------------------|------------------------|
+| **Accuracy**        | 0.74                | 0.84                 | **0.85**               |
+| **Precision (Churn)** | 0.41              | 0.60                 | **0.63**               |
+| **Recall (Churn)**    | **0.64**           | 0.60                 | 0.61                   |
+| **F1-Score (Churn)**  | 0.50               | 0.60                 | **0.62**               |
+| **AUC-ROC**         | 0.77                | 0.81                 | **0.85**               |
+
+---
 
 
+- **XGBoost** outperforms the other models in most metrics, achieving the best **accuracy**, **precision**, **F1-score**, and **AUC**.
+- **Logistic Regression** offers reasonable recall, but significantly underperforms in precision and overall classification power.
+- **Decision Tree** balances interpretability and performance, slightly behind XGBoost but still effective, especially in scenarios where explainability is crucial.
+
+
+---
+
+## Conclusions and Recommendations
+
+The objective of this analysis was to help the bank identify customers with the **highest probability of churn**, in order to implement **targeted retention strategies** that are both cost-effective and impactful.
+
+### Key Takeaways
+
+- Using a **random strategy**, contacting 20% of clients at random would likely reach only ~20% of churners (given the class imbalance).
+- However, using our **XGBoost model**, we can contact the **top 20% of clients with the highest predicted probability of churn** and capture over **60% of actual churners**, as shown by the **Gain Curve**.
+- The **Lift Curve** confirms that this model delivers **more than 3x the performance of random targeting**, making it the ideal tool to **prioritize outreach and allocate retention resources efficiently**.
+
+---
+
+### Model Strategy
+
+- **XGBoost** showed the **best predictive performance** across all models, making it the optimal choice for practical deployment.
+- **Logistic Regression** and **Decision Tree**—while slightly less accurate—offer **valuable interpretability** that can guide **data-driven marketing and customer strategy**.
+
+---
+
+### Strategic Insights from Models
+
+- **High-balance and high-income customers** show surprisingly high churn rates. These valuable clients may not find current offerings attractive, suggesting a need for **premium retention campaigns**.
+- **Older clients (over 43 years)** are also more likely to leave, as identified by the decision tree. Designing **age-specific engagement strategies** could help reduce churn in this segment.
+- **Inactive members** (low engagement) are significantly more likely to churn—highlighted clearly by the logistic model.
+- **German clients** have notably higher churn probabilities, possibly due to product-market fit or service differences. This group warrants **further investigation**.
+- **Male customers** appear more likely to stay, though further research is needed to understand the behavioral patterns behind this trend.
+
+---
+
+---
+
+## Business Value Estimation
+
+Let’s estimate the **financial impact** of deploying the model in a real-world retention campaign.
+
+### Assumptions:
+- The model is used to **contact the top 5,000 clients** predicted as most likely to churn.
+- **Retention cost per client** (e.g., phone calls, offers): **€400**
+- **Estimated value retained per client**: **€1,800**
+- Thus, **net value per retained client** = €1,800 - €400 = **€1,400**
+
+### Potential Impact:
+If the model helps us retain **5,000 customers**, the bank could prevent the loss of:
+
+- **Total cost of contacting**: 5,000 × €400 = **€2,000,000**
+- **Total value retained**: 5,000 × €1,800 = **€9,000,000**
+- **Net gain (after costs)**: 5,000 × €1,400 = **€7,000,000**
+---
+
+## Recommendation: A/B Testing for Pilot Phase
+
+To validate the model’s effectiveness before full deployment, we propose an **A/B test**:
+- **Group A**: 5,000 high-risk clients identified by the model.
+- **Group B**: 5,000 randomly selected clients (control).
+  
+Track the **churn rate**, **conversion**, and **cost per retention** in each group over a period (e.g., 1–3 months).
+
+This will help demonstrate:
+- The **lift over random targeting**.
+- The **real-world ROI** of the model.
+
+---
+##  Final Assessment: Did We Meet Our Goals?
+
+The primary objective was to help the bank **identify customers with high probability of churn** in order to **prioritize retention efforts** efficiently.
+
+### Model Accuracy
+The final **XGBoost model** achieved an accuracy of:
+
+**Accuracy** = `(TP + TN) / Total` = `(1446 + 250) / 2000` = **84.8%**
+
+This is a solid performance given the class imbalance, and confirms the model's reliability in real-world use.
