@@ -426,9 +426,33 @@ print("Mejores hiperparámetros:", grid_search.best_params_)
 
 After training, we used the **best estimator** returned by GridSearch to predict probabilities on the test set. Using a decision threshold of **0.64** (previously determined for better F1-score balance), we classified the final outputs and evaluated model performance.
 
+<p align="center">
+  <img src="Images/Results Class Tree adj.png" width="400"/>
+</p>
+
 ```python
 # Final classification with optimal tree
 y_prob = grid_search.best_estimator_.predict_proba(X_test)[:, 1]
 y_pred_final = (y_prob >= 0.64).astype(int)
 ```
+
+### Final Evaluation – Tuned Decision Tree
+
+After tuning hyperparameters using GridSearchCV, the decision tree model showed improved performance compared to the logistic regression baseline.
+
+#### Confusion Matrix
+|               | Predicted: No Churn | Predicted: Churn |
+|---------------|---------------------|------------------|
+| Actual: No Churn | 1429                | 164              |
+| Actual: Churn    | 162                 | 245              |
+
+#### Classification Report
+
+- **Accuracy:** 84%
+- **Precision:** 0.60 (for churn class)
+- **Recall:** 0.60 (for churn class)
+- **F1-score:** 0.60 (for churn class)
+- **AUC-ROC:** ~0.81
+
+This model presents a **balanced improvement in both precision and recall** for the churn class (positive class), reaching an **F1-score of 0.60** and a strong **AUC-ROC of 0.81**, outperforming the logistic regression model. The confusion matrix shows that the model is better at capturing churned clients without excessively misclassifying non-churned ones. This makes it a **more robust tool for retention strategies**, with a more reliable risk segmentation than simpler linear models.
 
