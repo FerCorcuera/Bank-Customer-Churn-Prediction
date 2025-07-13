@@ -485,3 +485,17 @@ This behavior is especially useful in business contexts where we want to **targe
 *Figure: Gain curve illustrating the effectiveness of the decision tree model in identifying churners compared to a random strategy.*
 
 The gain curve shows that the classification tree significantly outperforms random selection. By targeting just **20% of the clients**, the model captures **more than 60%** of churners. This demonstrates the model’s ability to effectively prioritize high-risk customers, making it a valuable tool for **resource allocation and targeted retention strategies**.
+
+### Decision Tree Visualization and Rule Extraction
+
+<img src="Images/Tree.png" width="800"/>
+
+*Figure: Pruned visualization of the decision tree used to predict customer churn.*
+
+The tree provides interpretable decision paths that help explain customer churn behavior. Some key insights include:
+
+- **Younger customers (Age ≤ 42.5)** with **fewer products (≤ 2)** and **low balances (≤ 1,884.34)** are likely to **stay**.
+- Clients with **high balances (> 55,948.91)** and **higher salaries (> 188,544.7)** are at **greater risk of churn**, even if they are younger.
+- For **older clients (Age > 42.5)**:
+  - **Inactive members** with **few products** or **higher ages (> 50.5)** are more likely to **churn**.
+  - **Active members** tend to stay, unless they have **high balances** and **many products**.
