@@ -179,9 +179,11 @@ We explored how the churn behavior (Exited) relates to other variables in the da
 ![Bivariate Visualizations](Images/Bivariate%20graphs.png)  
 *Figure: Key bivariate plots (Age, Geography, NumOfProducts vs. Exited)*
 
-![Correlation Matrix](Images/Correlationi%20Matrix.png)  
-*Figure: Pearson correlation matrix between numerical features and churn*
+<p align="center">
+  <img src="Images/Correlationi%20Matrix.png" alt="Correlation Matrix" width="600"/>
+</p>
 
+<p align="center"><em>Figure: Pearson correlation matrix between numerical features and churn</em></p>
 ## Data Preparation
 
 Before training the model, we performed basic preprocessing steps to clean and prepare the dataset:
@@ -273,9 +275,9 @@ The goal in this context is to **identify churn-prone customers** who are both l
 
 The threshold that achieved the **highest F1-score**, offering the best harmonic balance between Precision and Recall, was selected and applied to the final predictions.
 
-![Threshold Optimization - Logistic Regression](Images/Threshold_Optimization_Logic.png)
-
-
+<p align="center">
+  <img src="Images/logic_threshold_curve.png" alt="Precision, Recall and F1 vs Threshold" width="600"/>
+</p>
 
 ### 📊 Model Evaluation
 
@@ -300,4 +302,48 @@ Predictions were made using the adjusted threshold of **0.543**. Below is the co
 - **Accuracy:** 0.74
 - **AUC**: 0.77
 
-![Roc Curve - Logistic Regression](Images/Roc%20Curve%20-%20Logic.png)
+
+Despite addressing class imbalance and tuning the decision threshold for optimal F1-score, the model still shows **low precision** for identifying churners. This suggests that the **logistic regression model may be too limited** to capture the underlying patterns. Improving performance could require more powerful classifiers and/or advanced **feature engineering**.
+
+<p align="center">
+  <img src="Images/Roc%20Curve%20-%20Logic.png" alt="ROC Curve - Logistic Regression" width="500"/>
+</p>
+<p align="center"><em>Figure: ROC curve showing model performance across thresholds</em></p>
+
+### Logistic Regression – Coefficient Analysis
+
+The table below shows the coefficients from the logistic regression model along with their statistical significance:
+
+| Feature              | Coefficient | P-value | Interpretation |
+|----------------------|-------------|---------|----------------|
+| **IsActiveMember**   | -1.03       | 0.000   | Strongest negative effect on churn; active members are less likely to leave. |
+| **Gender (Male)**    | -0.52       | 0.000   | Men are less likely to churn compared to women. |
+| **Geography_Germany**| +0.82       | 0.000   | Customers from Germany are significantly more likely to churn. |
+| **Age**              | +0.07       | 0.000   | Churn probability increases with age. |
+| **Balance**          | +0.000003   | 0.000   | Higher balances slightly increase churn likelihood (marginal effect). |
+| **CreditScore**      | -0.0009     | 0.004   | Lower credit scores increase churn probability. |
+| **NumOfProducts**    | -0.12       | 0.022   | Customers with more products are less likely to churn. |
+| **Geography_Spain**  | +0.045      | 0.570   | Not statistically significant. |
+| **Tenure**           | -0.007      | 0.504   | Not statistically significant. |
+| **HasCrCard**        | -0.071      | 0.284   | Not statistically significant. |
+| **EstimatedSalary**  | +0.0000008  | 0.116   | Not statistically significant. |
+
+**Key Takeaways:**
+- The strongest **predictors of churn** are customer activity (`IsActiveMember`), age, geography (especially Germany), and gender.
+- **Non-significant features** (e.g., tenure, credit card ownership, estimated salary) contribute little to the model's explanatory power and could potentially be excluded or transformed in future iterations.
+- These coefficients are **interpreted in log-odds**, so their effect on probability is not linear but directionally meaningful.
+
+<p align="center">
+  <img src="Images/Importance%20of%20variables%20-%20Logic.png" alt="Logistic Regression - Coefficient Importance" width="550"/>
+</p>
+<p align="center"><em>Figure: Feature importance based on logistic regression coefficients</em></p>
+
+**Lift Curve - Logistic Regresion**
+
+<p align="center">
+  <img src="Images/Lift%20Curve%20-%20Logic.png" alt="Lift Curve - Logistic Regression" width="600"/>
+</p>
+<p align="center"><em>Figure: Lift Curve - Logistic Regression</em></p>
+
+The **Lift Curve** shows that the logistic regression model significantly outperforms random targeting, especially in the top customer deciles. For example, contacting the top 10% most likely churners yields up to **3.5 times** more actual churners than a random selection.  
+This highlights the model's practical value for **targeted retention strategies** and confirms its utility even with moderate predictive power.
