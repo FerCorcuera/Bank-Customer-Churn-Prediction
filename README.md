@@ -140,3 +140,20 @@ In both cases, we chose **not to remove or cap** the outliers due to their low f
 
 ![Boxplots of Numerical Variables](Images/Boxplots%20-%20Univariate.png)
 
+
+### Univariate Analysis – Categorical Variables
+
+We analyzed the distribution of key categorical features to understand the composition of the customer base and identify any potential imbalance that could affect the modeling phase.
+
+- **Geography:** About half of the bank’s clients are from France, while the remaining are evenly split between Spain and Germany.
+- **Gender:** The gender distribution is nearly even, with a slight majority of male customers (~5% more than female).
+- **Has Credit Card:** Approximately 70% of clients hold a credit card, while 30% do not. This could reflect differing levels of engagement with bank services.
+- **Is Active Member:** Nearly half of the customers are not considered active members, which may indicate lower interaction or satisfaction with the bank.
+- **Exited (Churn):** Around **20%** of customers have exited the bank, compared to **80%** who remain. This reveals a significant **class imbalance** that must be addressed in the modeling phase through techniques such as:
+  - Threshold adjustment
+  - Using robust metrics (e.g., AUC, F1-score, Lift)
+  - Resampling strategies (oversampling, undersampling)
+
+#### Categorical Variables Distribution
+
+![Categorical Variables Distribution](Images/Categoric%20Variables%20Distribution.png)
